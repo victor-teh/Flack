@@ -2,7 +2,7 @@
 online messaging service using Flask (Web Programming with Python and JavaScript)
 
 ## Requirements
-- [ ] Display Name: When a user visits your web application for the first time, they should be prompted to type in a display name that will eventually be associated with every message the user sends. If a user closes the page and returns to your app later, the display name should still be remembered.
+- [x] Display Name: When a user visits your web application for the first time, they should be prompted to type in a display name that will eventually be associated with every message the user sends. If a user closes the page and returns to your app later, the display name should still be remembered.
 
 - [ ] Channel Creation: Any user should be able to create a new channel, so long as its name doesn’t conflict with the name of an existing channel.
 
