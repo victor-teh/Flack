@@ -66,6 +66,7 @@ $(function () {
                 inRoom = true;
                 privateWindow = false;
             }
+            $('#channel_name').text(activeChannel);
             socket.emit('join', { 'channel': activeChannel, 'mymessage': 'has entered the room', 'username': username, 'time': time });
         });
         // Request to Add channel
@@ -73,7 +74,6 @@ $(function () {
             var channelName = $('.add_channel').val();
             channelName = channelName.charAt(0).toUpperCase() + channelName.slice(1);
             socket.emit('new channel', { 'channel': channelName });
-
         });
     })
     // Load channel
@@ -105,14 +105,18 @@ $(function () {
     socket.on('add channel', data => {
         if (data["error"] != "") {
             window.setTimeout(function () {
-                $('.channel_error').text(data["error"]);
+                $('.channel_msg').addClass('text-danger');
+                $('.channel_msg').text(data["error"]);
                 $('.add_channel').val("");
             }, 900);
         } else {
+            $('.channel_msg').addClass('text-success');
+            $('.channel_msg').text("");
+            $('.add_channel').val("");
             appendChannel(data['channel']);
             $('#channelList li:last').addClass('active');
             $('#channelList li:last').click();
-            inRoom = true;
+            // inRoom = true;
             var removeHash = $('#channelList li:last').text().slice(1);
             localStorage.setItem('activeChannel', removeHash);
             $('#channelList').scrollTop(500000);
