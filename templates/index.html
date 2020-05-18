@@ -54,7 +54,7 @@
                     </div>
                     <div class="card-body contacts_body">
                         <ui class="contacts" id="channelList">
-                        <!--place for list of channels-->
+                            <!--place for list of channels-->
                         </ui>
                     </div>
                     <div class="card-footer"></div>
@@ -63,23 +63,27 @@
             <!-- right -->
             <div class="col-md-8 col-xl-6 chat">
                 <div class="card">
-                    <div class="card-header msg_head">
+                    <!-- <div class="card-header msg_head">
                         <div class="d-flex bd-highlight">
                             <div class="user_info">
                                 <span id='channel_name'>Channel Name</span>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="card-body msg_card_body" id="messages">
                         <div class="d-flex justify-content-start mb-4">
                             <div class="msg_cotainer">
                                 <span class="font-weight-bold">Display Name</span><br>
-                                Hi, how are you samim?
+                                <p class="m-0">
+
+                                    Hi, how are you samim?
+                                </p>
                                 <span class="msg_time">8:40 AM, Today</span>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end mb-4">
                             <div class="msg_cotainer_send">
+                                <span class="font-weight-bold">Display Name</span><br>
                                 Hi Khalid i am good tnx how about you?
                                 <span class="msg_time_send">8:55 AM, Today</span>
                             </div>
@@ -111,9 +115,9 @@
                     </div>
                     <div class="card-footer">
                         <div class="input-group">
-                            <textarea name=""  id="messageInput" class="form-control type_msg"
+                            <textarea name="" id="messageInput" class="form-control type_msg"
                                 placeholder="Type your message..."></textarea>
-                            <div class="input-group-append">
+                            <div class="input-group-append" id="messageInputButton">
                                 <span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
                             </div>
                         </div>

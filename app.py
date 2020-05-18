@@ -19,12 +19,11 @@ limit = 100
 @app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("index.html")
-
+    
 @socketio.on('connect')
 def connect():
     emit("load channels",{'channels':channels})
     
-
 @socketio.on('new username')
 def new_username(data):
     username=""
@@ -75,3 +74,48 @@ def join(data):
 def come_back_to_general():
     emit("announce to all",{'channels':channels},broadcast=True)
 
+@socketio.on('update users channels')
+def update_users_channels(data):
+    channel=data['channel']
+    emit("update channels",{'channel':channel},broadcast=True)
+
+@socketio.on('submit to all')
+def submit_to_all(data):
+    message={'text':data["mymessage"],'username':data['username'],"time":data['time']}
+    channels['General'].append(message)
+    if (len(channels['General'])>limit):
+        channels['General'].pop(0)
+    emit("announce to all",{'channels':channels},broadcast=True)
+
+@socketio.on('submit to room')
+def submit_to_room(data):
+    room = data["channel"]
+    message={'text':data["mymessage"],'username':data['username'],"time":data['time']}
+    channels[data["channel"]].append(message)
+    if (len(channels[data["channel"]])>limit):
+        channels[data["channel"]].pop(0)
+    emit("announce to room",{'channels':channels},room=room)
+
+@socketio.on('private')
+def private(data):
+    message={'text':data["mymessage"],'username':data['username'],"time":data['time']}
+    room=data['username']+data['username2']
+    if data['username'] not in privateMessages:
+        privateMessages[data['username']]={}
+    if data['username2'] not in privateMessages:
+        privateMessages[data['username2']]={}
+    if data['username'] not in privateMessages[data['username2']]:
+        privateMessages[data['username2']][data['username']]=[]
+    if data['username2'] not in privateMessages[data['username']]:
+        privateMessages[data['username']][data['username2']]=[]
+    privateMessages[data['username2']][data['username']].append(message)
+    privateMessages[data['username']][data['username2']].append(message)
+    if (len(privateMessages[data['username2']][data['username']])>limit):
+        privateMessages[data['username2']][data['username']].pop(0)
+    if (len(privateMessages[data['username']][data['username2']])>limit):
+        privateMessages[data['username']][data['username2']].pop(0)
+    #assign two users into room
+    socketio.server.enter_room(usersList[data['username2']], room)
+    socketio.server.enter_room(request.sid, room)
+    emit('private room',{'privateMessages':privateMessages,'sender':data['username'],'receiver':data['username2']},room=room)
+    
