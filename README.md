@@ -16,6 +16,6 @@ online messaging service using Flask (Web Programming with Python and JavaScript
 
 - [ ] Personal Touch: Add at least one additional feature to your chat application of your choosing! Feel free to be creative, but if you’re looking for ideas, possibilities include: supporting deleting one’s own messages, supporting use attachments (file uploads) as messages, or supporting private messaging between two users.
 
-- [ ] In README.md, include a short writeup describing your project, what’s contained in each file, and (optionally) any other additional information the staff should know about your project. Also, include a description of your personal touch and what you chose to add to the project.
+- [x] In README.md, include a short writeup describing your project, what’s contained in each file, and (optionally) any other additional information the staff should know about your project. Also, include a description of your personal touch and what you chose to add to the project.
 
 - [x] If you’ve added any Python packages that need to be installed in order to run your web application, be sure to add them to requirements.txt!

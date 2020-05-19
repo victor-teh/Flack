@@ -143,7 +143,7 @@ $(function () {
             appendChannel(data['channel']);
             $('#channelList li:last').addClass('active');
             $('#channelList li:last').click();
-            // inRoom = true;
+            inRoom = true;
             var removeHash = $('#channelList li:last').text().slice(1);
             localStorage.setItem('activeChannel', removeHash);
             $('#channelList').scrollTop(500000);
@@ -165,8 +165,8 @@ $(function () {
     socket.on('joined', data => {
         loadMessages(data);
         $('#messageInput').focus();
-        $('.text-danger').on('click', function () {
-            chooseUser($(this).text());
+        $('.text-info').on('click', function () {
+            // chooseUser($(this).text());
         });
     });
 
@@ -180,75 +180,152 @@ $(function () {
             loadMessages(data);
         }
 
-        $('.text-danger').on('click', function () {
-            chooseUser($(this).text());
+        $('.text-info').on('click', function () {
+            // chooseUser($(this).text());
         });
     });
 
     socket.on('announce to room', data => {
         loadMessages(data);
-        $('.text-danger').on('click', function () {
-            chooseUser($(this).text());
+        $('.text-info').on('click', function () {
+            // chooseUser($(this).text());
         });
     });
-
-})
-function loadChannels(data) {
-    for (channel in data['channels']) {
-        appendChannel(channel);
-    }
-}
-function appendChannel(channel) {
-    const li = document.createElement('li');
-    const div = document.createElement('div');
-    const div2 = document.createElement('div');
-    const span = document.createElement('span');
-    div.className = 'd-flex bd-highlight'
-    div2.className = 'user_info'
-    li.append(div);
-    div.append(div2);
-    div2.append(span);
-    span.innerHTML = '#' + channel.charAt(0).toUpperCase() + channel.slice(1);
-    li.setAttribute("id", channel);
-    $('#channelList').append(li);
-}
-function loadMessages(data) {
-    $('#messages').html("");
-    for (x in data['channels'][activeChannel]) {
+    socket.on('private room', data => {
+        const li = document.createElement('li');
         const div = document.createElement('div');
         const div2 = document.createElement('div');
-        const nameSpan = document.createElement('span');
-        const p = document.createElement('p');
-        const timeSpan = document.createElement('span');
-        nameSpan.innerHTML = data['channels'][activeChannel][x]['username']
-        p.innerHTML = data['channels'][activeChannel][x]['text']
-        timeSpan.innerHTML = data['channels'][activeChannel][x]['time'];
-
-        if (data['channels'][activeChannel][x]['username'] == localStorage.getItem('username')) {
-            div.className = 'd-flex justify-content-end mb-4';
-            div2.className = 'msg_cotainer_send';
-            nameSpan.className = 'font-weight-bold text-success';
-            timeSpan.className = 'msg_time_send';
-        } else {
-            div.className = 'd-flex justify-content-start mb-4';
-            div2.className = 'msg_cotainer';
-            nameSpan.className = 'font-weight-bold text-danger';
-            timeSpan.className = 'msg_time';
-        }
-
-        p.className = 'm-0';
-
-        $('#messages').append(div);
+        const span = document.createElement('span');
+        div.className = 'd-flex bd-highlight'
+        div2.className = 'user_info'
+        li.append(div);
         div.append(div2);
-        div2.append(nameSpan);
-        div2.append(p);
-        div2.append(timeSpan);
+        div2.append(span);
 
-        $('#messages').scrollTop(500000);
+        if (data["sender"] == localStorage.getItem('username')) {
+            privateWindow = true;
+            inRoom = false;
+            $('#channelList .active').removeClass('active');
+            li.addClass('active');
+            localStorage.setItem('activeMessage', data['receiver']);
+            loadPrivateMessages(data, data['receiver']);
+            var receiverExist = false;
+            $("#inbox > span").each(function () {
+                if ($(this).text().search(data['receiver']) > -1) {
+                    receiverExist = true;
+                }
+            });
+            if (!receiverExist) {
+                span.innerHTML = data['receiver'];
+                $('#inbox').append(li);
+            }
+        } else {
+            //if private window open
+            if (privateWindow) {
+                if (localStorage.getItem('activeMessage') == data['sender']) {
+                    loadPrivateMessages(data, data['sender']);
+                } else {
+                    var senderExist = false;
+                    $("#inbox > span").each(function () {
+                        if ($(this).text().search(data['sender']) > -1) {
+                            $(this).html(data['sender']);
+                            $(this).addClass('bg-info');
+                            senderExist = true;
+                        }
+                    });
+                    if (!senderExist) {
+                        span.innerHTML = data['sender'];
+                        div.className = 'fd-flex bd-highlight bg-info';
+                        $('#inbox').append(li);
+                    }
+                }
+            } else {
+                var senderExist = false;
+                $("#inbox > span").each(function () {
+                    if ($(this).text().search(data['sender']) > -1) {
+                        $(this).html(data['sender']);
+                        $(this).addClass('bg-info');
+                        senderExist = true;
+                    }
+                });
+                if (!senderExist) {
+                    span.innerHTML = data['sender'];
+                    div.className = 'd-flex bd-highlight bg-info';
+                    $('#inbox').append(li);
+                }
+            }
+        }
+        $('#inbox li').on('click', function () {
+            $('#messageInput').focus();
+            localStorage.setItem('activeMessage', $(this > span).text());
+            $(this > span).removeClass('bg-info');
+            loadPrivateMessages(data, $(this > span).text());
+            privateWindow = true;
+            const username = localStorage.getItem('username');
+            const time = new Date().toLocaleString();
+            activeChannel = localStorage.getItem('activeChannel');
+            if (activeChannel != "General" && inRoom) {
+                socket.emit('leave', { 'channel': activeChannel, 'mymessage': 'has left the room', 'username': username, 'time': time });
+            }
+            inRoom = false;
+            $('#channelList .active').removeClass('active');
+        });
+    });
+    function loadChannels(data) {
+        for (channel in data['channels']) {
+            appendChannel(channel);
+        }
     }
-}
-function chooseUser(user) {
-    if (user != localStorage.getItem('username')) {
+    function appendChannel(channel) {
+        const li = document.createElement('li');
+        const div = document.createElement('div');
+        const div2 = document.createElement('div');
+        const span = document.createElement('span');
+        div.className = 'd-flex bd-highlight'
+        div2.className = 'user_info'
+        li.append(div);
+        div.append(div2);
+        div2.append(span);
+        span.innerHTML = '#' + channel.charAt(0).toUpperCase() + channel.slice(1);
+        li.setAttribute("id", channel);
+        $('#channelList').append(li);
+    }
+    function loadMessages(data) {
+        $('#messages').html("");
+        for (x in data['channels'][activeChannel]) {
+            const div = document.createElement('div');
+            const div2 = document.createElement('div');
+            const nameSpan = document.createElement('span');
+            const p = document.createElement('p');
+            const timeSpan = document.createElement('span');
+            nameSpan.innerHTML = data['channels'][activeChannel][x]['username']
+            p.innerHTML = data['channels'][activeChannel][x]['text']
+            timeSpan.innerHTML = data['channels'][activeChannel][x]['time'];
+
+            if (data['channels'][activeChannel][x]['username'] == localStorage.getItem('username')) {
+                div.className = 'd-flex justify-content-end mb-4';
+                div2.className = 'msg_cotainer_send';
+                nameSpan.className = 'font-weight-bold text-success';
+                timeSpan.className = 'msg_time_send';
+            } else {
+                div.className = 'd-flex justify-content-start mb-4';
+                div2.className = 'msg_cotainer';
+                nameSpan.className = 'font-weight-bold text-info pointer';
+                timeSpan.className = 'msg_time';
+            }
+
+            p.className = 'm-0';
+
+            $('#messages').append(div);
+            div.append(div2);
+            div2.append(nameSpan);
+            div2.append(p);
+            div2.append(timeSpan);
+
+            $('#messages').scrollTop(500000);
+        }
+    }
+    function chooseUser(user) {
         const username = localStorage.getItem('username');
         const time = new Date().toLocaleString();
         activeChannel = localStorage.getItem('activeChannel');
@@ -259,8 +336,41 @@ function chooseUser(user) {
         if (activeChannel != "General") {
             socket.emit('leave', { 'channel': activeChannel, 'mymessage': 'has left the room', 'username': username, 'time': time });
         }
-    } else {
-
+        $('#messageInput').focus();
     }
-    $('#messageInput').focus();
-}
+    function loadPrivateMessages(data, otherUser) {
+        $('#messages').html("");
+        for (message in data['privateMessages'][localStorage.getItem('username')][otherUser]) {
+            const div = document.createElement('div');
+            const div2 = document.createElement('div');
+            const nameSpan = document.createElement('span');
+            const p = document.createElement('p');
+            const timeSpan = document.createElement('span');
+            nameSpan.innerHTML = data['privateMessages'][localStorage.getItem('username')][otherUser][message]['username']
+            p.innerHTML = data['privateMessages'][localStorage.getItem('username')][otherUser][message]['text']
+            timeSpan.innerHTML = data['privateMessages'][localStorage.getItem('username')][otherUser][message]['time'];
+
+            if (data['privateMessages'][localStorage.getItem('username')][otherUser][message]['username'] == localStorage.getItem('username')) {
+                div.className = 'd-flex justify-content-end mb-4';
+                div2.className = 'msg_cotainer_send';
+                nameSpan.className = 'font-weight-bold text-success';
+                timeSpan.className = 'msg_time_send';
+            } else {
+                div.className = 'd-flex justify-content-start mb-4';
+                div2.className = 'msg_cotainer';
+                nameSpan.className = 'font-weight-bold text-info pointer';
+                timeSpan.className = 'msg_time';
+            }
+
+            p.className = 'm-0';
+
+            $('#messages').append(div);
+            div.append(div2);
+            div2.append(nameSpan);
+            div2.append(p);
+            div2.append(timeSpan);
+
+            $('#messages').scrollTop(500000);
+        }
+    }
+})

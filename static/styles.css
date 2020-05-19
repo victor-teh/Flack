@@ -221,3 +221,7 @@ html {
         margin-bottom: 15px !important;
     }
 }
+
+.pointer {
+    cursor: pointer;
+}
