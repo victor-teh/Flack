@@ -119,3 +119,5 @@ def private(data):
     socketio.server.enter_room(request.sid, room)
     emit('private room',{'privateMessages':privateMessages,'sender':data['username'],'receiver':data['username2']},room=room)
     
+if __name__ == '__main__':
+    socketio.run(app)

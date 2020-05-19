@@ -21,7 +21,8 @@
         crossorigin="anonymous"></script>
 
     <!-- socket io -->
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+        integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 
     <!-- My CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
@@ -56,13 +57,13 @@
                         <ui class="contacts" id="channelList">
                             <!--place for list of channels-->
                         </ui>
-                        <hr>
+                        <!-- <hr>
                         <div class="card-header">
                             <h5 class="text-center text-white">Private Messages</h5>
                         </div>
                         <ui class="contacts" id="inbox">
-                            <!--place for list of messages-->
-                        </ui>
+                            place for list of messages
+                        </ui> -->
 
                     </div>
                     <div class="card-footer"></div>

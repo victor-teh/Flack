@@ -1,6 +1,7 @@
 $(function () {
     // document ready 
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    var socket = io();
+    // var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
     privateWindow = false;
     inRoom = false;
     socket.on('connect', () => {
